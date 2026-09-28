@@ -204,7 +204,7 @@ function renderPlan() {
     `</tbody><tfoot><tr><td colspan="6" style="text-align:left;color:#9aa7b4;font-size:12px">
       现价 ${P.spot}，20 日已实现波动 ${fmt(P.rv, 0)}%；权利金为 Black-Scholes 估算（IV 45–55%），非实盘报价。
       选中行 = 本单采用（-15% OTM / 45 天）。</td></tr></tfoot>`;
-  $('#p-ma').textContent = (DATA.meta.qqq_ma200 || 0).toFixed(2);
+  $('#p-ma').textContent = (DATA.entry && DATA.entry.today ? DATA.entry.today.qqq_ma200 : (DATA.meta.qqq_ma200 || 0)).toFixed(2);
   const W = DATA.windows.find(w => w.label.indexOf('2018-01') === 0);
   const W2 = DATA.windows.find(w => w.label.indexOf('2022-01') === 0);
   $('#p-plan').innerHTML =
