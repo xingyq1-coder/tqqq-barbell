@@ -15,12 +15,15 @@
   </div>
   <nav id="tabs">
     <button class="tab active" data-t="verdict">结论</button>
+    <button class="tab" data-t="tonight">今晚执行单</button>
+    <button class="tab" data-t="entry">① 进场时机</button>
+    <button class="tab" data-t="hold">② 持有 10 年</button>
+    <button class="tab" data-t="ammo">③ 弹药纪律</button>
     <button class="tab" data-t="lab">参数实验室</button>
     <button class="tab" data-t="yearly">逐年对照</button>
     <button class="tab" data-t="windows">窗口扫描</button>
     <button class="tab" data-t="bswan">黑天鹅场景</button>
     <button class="tab" data-t="dotcom">科网路径</button>
-    <button class="tab" data-t="plan">执行单 v3</button>
     <button class="tab" data-t="method">方法与局限</button>
   </nav>
 </header>
@@ -114,48 +117,149 @@
     <div class="box"><h3>读法（数字由脚本动态生成，不手写）</h3><ul id="d-notes"></ul></div>
   </section>
 
-  <!-- 执行单 -->
-  <section id="plan" class="panel">
-    <h1>执行单 v3 · $20,000</h1>
+  <!-- 今晚执行单 -->
+  <section id="tonight" class="panel">
+    <h1>今晚执行单 · $20,000</h1>
+    <p class="sub">目标：① 找时机把 TQQQ 建起来 ② 拿 10 年以上 ③ 今晚先买两个防御腿（JEPQ / JAAA）</p>
+    <div class="box"><h3>今晚先做这几步</h3><table id="t-steps"></table></div>
     <div class="two">
-      <div class="box"><h3>一、资金分配</h3>
+      <div class="box"><h3>资金分配</h3>
         <table id="p-alloc"></table>
-        <p class="note">1 张 TQQQ put = 100 股 ≈ 账户的 34–40%。2 张装不下（$13,600 担保 + $10,000 低波动腿 > $20,000）。硬上限 1 张。</p>
+        <p class="note">1 张 TQQQ put = 100 股 ≈ 账户的 34–40%。2 张装不下（$13,600 担保 + $10,000 低波动腿 &gt; $20,000）。硬上限 1 张。</p>
       </div>
-      <div class="box"><h3>二、三条常驻规则</h3>
-        <ol>
-          <li><b>65% 再平衡</b>：TQQQ 市值达组合 65%（$20,000 时 = $13,000）→ 减回 50/25/25。历史频率约每 16 个月一次。</li>
-          <li><b>趋势闸门</b>：QQQ 收盘跌破 200 日均线（当前 <span id="p-ma"></span>）→ TQQQ 减半入 JAAA；站回 → 恢复 50/25/25。用 QQQ 的均线，不用 TQQQ 的。</li>
-          <li><b>年度再锚定</b>：每年 1 月第一个交易日，恢复到「当前趋势状态应有的配置」（线上 50/25/25，线下 25/25/50）。</li>
-        </ol>
+      <div class="box"><h3>Sell Put 参数（建仓那一半）</h3>
+        <table id="p-put"></table>
       </div>
     </div>
+    <div class="box"><h3>接货价位表（这就是你对「建仓位置」的全部表达）</h3>
+      <table id="t-levels"></table>
+      <p class="note">put 行权价 68 对应 QQQ 约 -5% 的位置（TQQQ 现价 -15%）。低于 68 你才会被行权 —— 那正是「更好的位置」，而且是市场主动卖给你的。</p>
+    </div>
     <div class="two">
-      <div class="box"><h3>三、Sell Put 建仓</h3>
-        <table id="p-put"></table>
-        <ol class="tight">
-          <li>先买 JEPQ $5,000 与 JAAA $5,000。</li>
-          <li>卖 1 张 TQQQ put（行权价约现价下方 15%、45 天），用真现金担保。</li>
-          <li>未行权 → 权利金落袋，再卖下一张，<b>滚动上限 3 次</b>。</li>
-          <li>被行权 → 持有 100 股，用备用现金补 25 股，停止卖 put。</li>
-          <li>滚满 3 次未接到货 → 停止等待，直接市价买入（上限 $10,000）。</li>
-          <li>put 未了结期间，补仓条款挂起。</li>
+      <div class="box"><h3>三条常驻规则（不用你盯盘）</h3>
+        <ol>
+          <li><b>65% 再平衡</b>：TQQQ 市值达组合 65%（$20,000 时 = $13,000）→ 减回 50/25/25。</li>
+          <li><b>趋势闸门</b>：QQQ 收盘跌破 200 日均线（当前 <span id="p-ma"></span>）→ TQQQ 减半入 JAAA；站回 → 恢复 50/25/25。用 QQQ 的均线，不是 TQQQ 的。</li>
+          <li><b>年度再锚定</b>：每年 1 月第一个交易日，回到「当前趋势状态应有的配置」（线上 50/25/25，线下 25/25/50）。</li>
         </ol>
       </div>
-      <div class="box"><h3>四、补仓（缩水版）</h3>
+      <div class="box"><h3>补仓条款（缩水版，只开一枪）</h3>
         <ul>
-          <li>门槛：TQQQ 从自身运行高点回撤 <b>-20%</b>（今日 = 86.85 × 0.80 = 69.48，创新高后上移）。</li>
-          <li>动用：JAAA 储备的 <b>1/3</b>（$20,000 口径约 $1,667），不是原文的一半。</li>
-          <li>间隔：同一轮下跌至少 10 个交易日，一轮只开一枪。</li>
-          <li>理由：它在 2010-2019 是正贡献，在 2022-2026 是负贡献（年化少 3.6 个点、回撤多 10 个点）。窗口敏感 → 缩水而非删除。</li>
+          <li>门槛：TQQQ 从自身运行高点回撤 <b>-20%</b>（今日 = 86.85 × 0.80 = <b>69.48</b>，创新高后上移）。</li>
+          <li>动用：JAAA 储备的 <b>1/3</b>（约 $1,667），<b>永远保留 2/3 不动</b>。</li>
+          <li>间隔：至少 10 个交易日，一轮只开一枪，TQQQ 创新高后重置。</li>
+          <li>put 未了结期间，本条挂起（避免同一次下跌重复买入）。</li>
         </ul>
       </div>
     </div>
-    <div class="box"><h3>五、规划口径（用最不利的那段，不用最好看的）</h3>
+    <div class="box"><h3>禁止清单</h3><ul id="t-forbid"></ul></div>
+    <div class="box"><h3>规划口径（用最不利的那段，不用最好看的）</h3>
       <div class="cards small" id="p-plan"></div>
-      <p class="note">悲观 = 2022 起（高利率 + 持续熊 + 高波动）；中性 = 2018 起（四种崩盘形态）；乐观口径（2010–2021 零利率段）只作对照，不能当预期。</p>
+      <p class="note">悲观 = 2022 起（高利率 + 持续熊 + 高波动）；中性 = 2018 起（四种崩盘形态）；乐观口径（2010–2021 零利率段）只作对照，不能当预期。持有 10 年的完整分布见「② 持有 10 年」页。</p>
     </div>
-    <div class="box"><h3>六、红线</h3><ol id="p-red"></ol></div>
+    <div class="box"><h3>红线</h3><ol id="p-red"></ol></div>
+  </section>
+
+  <!-- 进场时机 -->
+  <section id="entry" class="panel">
+    <h1>① 进场时机：「距高点多少」不是有效的择时变量</h1>
+    <p class="sub">我用两种口径算同一个问题，得到互相矛盾的答案 —— 这个矛盾本身就是结论。</p>
+    <div class="cards" id="e-today"></div>
+    <div class="box"><h3>口径一：按「QQQ 距全历史最高点」分档（持有 10 年）</h3>
+      <table id="e-ath"></table>
+      <p class="note">看起来「等回调 5–20% 再进」更好。但「新高附近」那一档的样本几乎全部来自 1999–2000，「跌超 35%」那一档几乎全部来自 2001–2013 —— <b>它们比的不是入场位置，是三个不同的时代。</b></p>
+    </div>
+    <div class="box"><h3>口径二：按「距最近 12 个月高点」分档（跨时代可比，结论相反）</h3>
+      <table id="e-m12q"></table>
+      <p class="note">在 12 个月高点附近买入，中位收益反而最高。<b>同一套规则、同一个问题，两个口径给出相反答案 —— 说明「距高点多少」没有独立信息量。</b></p>
+    </div>
+    <div class="two">
+      <div class="box"><h3>按 TQQQ 自身距 12 个月高点分档</h3><table id="e-m12t"></table></div>
+      <div class="box"><h3>未来 1 年的收益与胜率</h3><table id="e-fwd"></table>
+        <p class="note">回调买入的<b>平均</b>收益不差，但<b>赢的概率从 86% 掉到 55–59%</b>；而且历史上有 33% 的交易日处在 -10% 以上，等到它要付出时间。</p>
+      </div>
+    </div>
+    <div class="box"><h3>今天的位置与历史同签名的对照</h3>
+      <div class="cards small" id="e-sig"></div>
+      <p class="note" id="e-sig-note"></p>
+      <table id="e-sig-tbl"></table>
+    </div>
+    <div class="box"><h3>所以：进场这一步怎么做</h3>
+      <ol>
+        <li><b>不要为了等某个位置而推迟。</b>等这个动作的胜率更低（55–59% vs 86%）。</li>
+        <li><b>把「我希望在什么价格接货」写进下单结构</b>，而不是写成「我要等到 X%」—— 今晚先买 JEPQ + JAAA，再卖 1 张行权价 68 的 TQQQ put（见「今晚执行单」页）。</li>
+        <li><b>最多拆成 3 次</b>：put 滚动上限 3 次；滚满没接到就市价买。这是对「最差入场事前无法识别」唯一有效的对冲。</li>
+        <li><b>额度封顶 $20,000</b>：如果 2000 年那次重演，最惨经历是 -88%（见过 $2,351），而不是改变生活。</li>
+      </ol>
+      <p class="note">一句话：<b>「距高点多少」的正确答案不是一个百分比，是一个结构</b> —— 一半现在买（低波动腿）、一半挂限价单等接货（put）、总额封顶。</p>
+    </div>
+  </section>
+
+  <!-- 持有 10 年 -->
+  <section id="hold" class="panel">
+    <h1>② 持有 10 年以上：决定收益率的是终点，不是持有期</h1>
+    <p class="sub">每个交易日都当过一次起点，持有期固定 —— 看分布怎么动。</p>
+    <div class="box"><h3>持有期拉长时，分布怎么动（策略）</h3>
+      <div class="chartbox"><canvas id="hConv"></canvas></div>
+      <table id="h-conv"></table>
+      <p class="note"><b>中位数在 1 年到 20 年里始终在 20–27% 之间晃，从未接近 30%。</b>变的是两端：最差从 -72% 收到 +5%，P90 从 74% 收到 27%。<b>拿得久买的是确定性，不是收益率。</b></p>
+    </div>
+    <div class="box"><h3>同一批起点、同一套规则，只改「终点」</h3>
+      <div class="chartbox"><canvas id="hEnd"></canvas></div>
+      <table id="h-end"></table>
+      <p class="note">「能不能拿到 30%」的比例从 0.0% 到 60.5%，全部由终点决定。<b>不是拿得久给你 30%，是你恰好在一个好位置上停下来。</b></p>
+    </div>
+    <div class="two">
+      <div class="box"><h3>最差的入场时机（全部落在 2000 年 1–3 月）</h3><table id="h-worst"></table></div>
+      <div class="box"><h3>最惨过程</h3>
+        <div class="cards small" id="h-wd"></div>
+        <p class="note">12 个最惨入场日的共同特征：<b>QQQ 站上 200 日线、距历史高点不到 3%（正在创新高）</b>。历史上最差的入场时机，在它发生的那一天，看起来和最好的入场时机一模一样。</p>
+      </div>
+    </div>
+    <div class="box"><h3>规则的真实代价（同一批起点，逐条开关）</h3>
+      <table id="h-switch"></table>
+      <p class="note"><b>每一条风控规则都在降低中位收益、换取尾部保护。</b>闸门用约 2 个点的中位收益，换来 P10 提升与「跑赢 QQQ 概率 89.8% → 100%」。这是保险的定价，不免费。</p>
+    </div>
+    <div class="box"><h3>P10 是什么</h3>
+      <p class="lead">把一堆结果从最差排到最好，排在倒数 10% 位置上的那个结果。<b>90% 的情况比它好，10% 的情况比它更差。</b>「P10 / 中位 / P90」= 坏运气 / 典型 / 好运气。</p>
+      <p class="note">为什么不用「最坏」：最坏只有一个样本（就是 2000 年那次），统计上不可靠。P10 代表「坏但没坏到极端」的常见情形 —— 这才是你该用来做准备的数字。换成钱：$20,000 持有 10 年，在历史新高附近建仓时 <b>P10 = 0.56 倍（-44%）</b>、中位 = 15 倍、P90 = 22.5 倍。</p>
+    </div>
+  </section>
+
+  <!-- 弹药纪律 -->
+  <section id="ammo" class="panel">
+    <h1>③ 弹药纪律：原文三档打光之后会怎样</h1>
+    <p class="sub">原文的「现金储备」只指 JAAA 那一格（25%），不含 JEPQ。三枪打光的上限是 TQQQ ≈ 75% / JEPQ 25% / JAAA 0%。</p>
+    <div class="cards small" id="a-cards"></div>
+    <div class="box"><h3>科网顶部建仓后，三枪是怎么打出去的</h3>
+      <table id="a-shots"></table>
+      <p class="note">第一枪触发时 TQQQ 已经跌了 -19.2%，而门槛写的是 -12% —— <b>暴跌是「跳过去」的，分档在快跌里并不分批</b>。三枪一共只隔了 6 个交易日。</p>
+    </div>
+    <div class="box"><h3>打光之后的三条路（同一段历史，2000-03-27 起）</h3>
+      <div class="chartbox"><canvas id="aAfter"></canvas></div>
+      <table id="a-after"></table>
+      <p class="note">趋势闸门比「打光后怎么办」重要得多（0.772 vs 1.378–2.406）。但闸门之上，「打光后继续按原样持有」就已经是重伤。<b>注意 C（清空）最好，但那是「提前知道崩盘还会继续」的事后最优 —— 2022 年就反了，所以不要把它当规则，要把「不再加仓」当规则。</b></p>
+    </div>
+    <div class="two">
+      <div class="box"><h3>如果连 JEPQ 也当弹药（你担心的那种执行）</h3><table id="a-full"></table>
+        <p class="note">要变成 100% TQQQ，必须把 JEPQ 那 25% 也打光 —— 原文没这条规则，但执行的人容易这么理解。代价：15 年终值 1.056 vs 1.378。</p>
+      </div>
+      <div class="box"><h3>谁在控制杠杆（科网 15 年里各机制的动作次数）</h3><div class="cards small" id="a-levers"></div>
+        <p class="note">65% 再平衡在那 15 年里<b>一次都没触发</b>（要求 QQQ 距高点 2% 以内）。真正干活的是年度再锚定和趋势闸门。</p>
+      </div>
+    </div>
+    <div class="box"><h3>本单口径：只开一枪</h3>
+      <div class="cards small" id="a-single"></div>
+      <p class="note">单档 -20% 补 1/3：科网那条路上终值 <b>1.712x</b>，比原文三档的 1.378x 好 —— 因为弹药永远留 2/3。代价是 TQQQ 权重最高仍会到 66.3%（那是上涨途中漂上去的，由再平衡与年度再锚定压回）。</p>
+    </div>
+    <div class="box"><h3>弹药纪律四条</h3>
+      <ol>
+        <li><b>弹药永不归零</b>：JAAA 的 1/3 是永久压舱，任何情况下不动。</li>
+        <li><b>打光/接近打光后只做一件事：停止买入</b>，并把年度再锚定的目标改成「当前趋势状态应有的配置」（线下 25/25/50，不倒回 50/25/25）。</li>
+        <li><b>不融资</b>；不动 JEPQ；不做「补仓摊成本」。</li>
+        <li><b>禁止在 put 未了结时并用 JAAA 补仓</b> —— 同一次下跌只允许一个买入动作。</li>
+      </ol>
+    </div>
   </section>
 
   <!-- 方法 -->

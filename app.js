@@ -46,11 +46,12 @@ async function boot() {
     card('Calmar（年化÷回撤）', fmt(K.real_calmar, 2), 'QQQ 0.56', 'v-good') +
     card('全样本 1999-2026 年化', pct(K.full_cagr, 1), 'QQQ ' + pct(K.full_qqq, 1), '') +
     card('科网顶建仓，回本用时', K.dotcom_years + ' 年', '$20,000 → ' + money(20000 * K.dotcom_s), 'v-warn') +
-    card('分段倍数（2010→2026）', K.segs.join(' → '), '优势在单调下降', 'v-bad');
+    card('分段倍数（2010→2026 四段）', K.segs.join(' → '), '无单调趋势：优势随时代波动', '');
   if (V.config) $('#v-cfg').textContent = V.config;
   $('#v-prem').innerHTML = V.premises.map(p => `<li>${p}</li>`).join('');
   $('#v-red').innerHTML = V.redlines.map(p => `<li>${p}</li>`).join('');
 
+  renderTonight(); renderEntry(); renderHold(); renderAmmo();
   renderYearly(); renderWindows(); renderScenarios(); renderDotcom(); renderPlan(); renderMethod();
   initLab();
 }
@@ -298,3 +299,169 @@ boot().then(() => {
   const h = location.hash.replace('#','');
   if (h) { const b = document.querySelector(`.tab[data-t="${h}"]`); if (b) b.click(); }
 });
+
+// ===== 新增四页的渲染（追加到 app.js 末尾） =====
+function renderTonight() {
+  const T = DATA.tonight;
+  $('#t-steps').innerHTML = '<thead><tr><th>步骤</th><th>做什么</th><th>何时</th><th>为什么</th></tr></thead><tbody>' +
+    T.steps.map(s => `<tr><td>${s.no}</td><td style="text-align:left">${s.what}</td><td>${s.when}</td><td style="text-align:left;color:#9aa7b4">${s.why}</td></tr>`).join('') +
+    '</tbody>';
+  $('#t-levels').innerHTML = '<thead><tr><th>QQQ 回撤</th><th>QQQ 价格</th><th>TQQQ 对应价</th><th>相对 TQQQ 现价</th><th>含义</th></tr></thead><tbody>' +
+    T.levels.map(l => `<tr${l.thr === 5 ? ' class="bs"' : ''}><td>-${l.thr}%</td><td>${l.qqq.toFixed(2)}</td>
+      <td><b>${l.tqqq.toFixed(2)}</b></td><td>${l.tqqq_pct}%</td>
+      <td style="text-align:left;color:#9aa7b4">${l.thr === 5 ? 'put 行权价 68 大致对应这一档' : ''}</td></tr>`).join('') + '</tbody>';
+  $('#t-forbid').innerHTML = T.forbidden.map(x => `<li>${x}</li>`).join('');
+}
+
+function renderEntry() {
+  const E = DATA.entry, t = E.today;
+  $('#e-today').innerHTML =
+    card('QQQ 现价', t.qqq_px.toFixed(2), '全历史高点 ' + t.qqq_ath.toFixed(2) + '（距高点 ' + t.qqq_dath + '%）', '') +
+    card('QQQ 200 日均线', t.qqq_ma200.toFixed(2), '现价在均线' + (t.qqq_px > t.qqq_ma200 ? '上方' : '下方'), '') +
+    card('TQQQ 现价', t.tqqq_px.toFixed(2), '全历史高点 ' + t.tqqq_ath.toFixed(2) + '（距高点 ' + t.tqqq_dath + '%）', '') +
+    card('今天的位置判定', '历史新高附近', '这一档的历史结果见下方', 'v-warn');
+
+  const bt = (el, rows) => table(el,
+    ['距高点区间', '样本', '中位年化', 'P10', 'P90', '亏损占比', '中位最深回撤'],
+    rows.map(b => ({
+      _cells: [b.label, b.n, pct(b.med), pct(b.p10), pct(b.p90), pct(b.loss), pct(b.mdd)],
+      _cls: (b.label.indexOf('新高') >= 0 && b.n < 1000) ? 'bs' : ''
+    })));
+  bt('#e-ath', E.ath); bt('#e-m12q', E.m12q); bt('#e-m12t', E.m12t);
+  table('#e-fwd', ['进场状态', '样本', '未来 1 年中位', '正收益概率'],
+    E.fwd1y.map(f => ({ _cells: [f.label, f.n, pct(f.med), pct(f.win, 0)], _cls: f.win > 80 ? '' : 'bs' })));
+
+  const S = E.sig;
+  $('#e-sig').innerHTML =
+    card('与今天签名相同的历史建仓日', S.n + ' 个', S.years.map(y => y.y + '：' + y.n).join(' / '), '') +
+    card('10 年中位年化', pct(S.med), 'P10 ' + pct(S.p10) + ' · P90 ' + pct(S.p90), 'v-acc') +
+    card('10 年仍亏钱的占比', pct(S.loss, 0), '最差 ' + pct(S.worst), 'v-bad') +
+    card('期间最深回撤（最惨）', pct(S.mdd_worst), '中位 ' + pct(S.mdd_med), 'v-warn');
+  $('#e-sig-note').innerHTML = '今天（QQQ 距高点 ' + t.qqq_dath + '%、站上 200 日线）与 2000-02-10 的状态签名相同。' +
+    '历史上同签名的 ' + S.n + ' 个建仓日只分成两个阵营：<b>1999–2000 那批是灾难（最差十之一亏钱、中途最深 -88%）</b>，' +
+    '2015–2016 那批很好（+30% 以上）。<b>两者在建仓当天的可观测特征完全一致 —— 没有任何技术指标能把它们分开。</b>' +
+    '（限制：要观察满 10 年，起点必须在 2016-09 之前。）';
+  table('#e-sig-tbl', ['同签名里最惨的建仓日', '10 年年化', 'QQQ 同期', '期间最深回撤'],
+    S.worst_rows.map(r => ({ _cells: [r.date, pct(r.cagr), pct(r.qqq), pct(r.mdd)], _cls: 'bs' })));
+}
+
+function renderHold() {
+  const H = DATA.horizon;
+  const cv = H.convergence;
+  new Chart($('#hConv'), {
+    type: 'line',
+    data: {
+      labels: cv.map(c => c.years + ' 年'),
+      datasets: [
+        { label: 'P10（坏运气）', data: cv.map(c => c.p10), borderColor: '#f85149', tension: .25, pointRadius: 3 },
+        { label: '中位', data: cv.map(c => c.med), borderColor: '#4ea1ff', borderWidth: 2.5, tension: .25, pointRadius: 4 },
+        { label: 'P90（好运气）', data: cv.map(c => c.p90), borderColor: '#3fb950', tension: .25, pointRadius: 3 },
+        { label: 'QQQ 中位', data: cv.map(c => c.qmed), borderColor: '#8b949e', borderDash: [5, 4], tension: .25, pointRadius: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmt(c.raw)}%` } } },
+      scales: { y: { ticks: { callback: v => v + '%' }, grid: { color: '#1e2530' } }, x: { grid: { display: false } } }
+    }
+  });
+  table('#h-conv', ['持有期', '样本', 'P10', '中位', 'P90', '最差', '最好', 'QQQ 中位', '跑赢 QQQ'],
+    cv.map(c => ({ _cells: [c.years + ' 年', c.n, pct(c.p10), '<b>' + pct(c.med) + '</b>', pct(c.p90), pct(c.worst), pct(c.best), pct(c.qmed), pct(c.win, 0)] })));
+
+  const ep = H.endpoint;
+  new Chart($('#hEnd'), {
+    type: 'bar',
+    data: {
+      labels: ep.map(e => e.end + ' 为止'),
+      datasets: [
+        { label: '策略中位年化', data: ep.map(e => e.med), backgroundColor: ep.map(e => e.med >= 0 ? '#4ea1f9aa' : '#f8514999'), borderRadius: 4 },
+        { label: 'QQQ 中位年化', data: ep.map(e => e.qmed), backgroundColor: '#8b949e77', borderRadius: 4 },
+        { label: '达到 30% 的起点占比（右轴）', data: ep.map(e => e.share30), type: 'line', borderColor: '#d29922', backgroundColor: '#d29922', yAxisID: 'y1', tension: .2, pointRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { ticks: { callback: v => v + '%' }, grid: { color: '#1e2530' } },
+                y1: { position: 'right', min: 0, max: 100, grid: { display: false }, ticks: { callback: v => v + '%' } },
+                x: { grid: { display: false } } }
+    }
+  });
+  table('#h-end', ['终点', '实际日期', '起点数', '策略中位', 'P10', 'P90', 'QQQ 中位', '达到 30% 的起点占比'],
+    ep.map(e => ({
+      _cells: [e.end, e.actual, e.n, '<b>' + pct(e.med) + '</b>', pct(e.p10), pct(e.p90), pct(e.qmed), pct(e.share30, 0)],
+      _cls: e.med < 0 ? 'bs' : ''
+    })));
+
+  table('#h-worst', ['持有期', '最差入场日', '策略年化', '倍率', '$20,000 →', 'QQQ 同期'],
+    H.worst.map(w => ({ _cells: [w.years + ' 年', w.date, pct(w.cagr), fmt(w.mult, 2) + 'x', money(w.v20), pct(w.qqq)], _cls: 'bs' })));
+  $('#h-wd').innerHTML =
+    card('最惨入场日', H.worst_dd.date, '建仓后 10 年内', 'v-bad') +
+    card('最深回撤', pct(H.worst_dd.mdd), '$20,000 最低见到 ' + money(H.worst_dd.low), 'v-bad');
+  table('#h-switch', ['配置', '10 年中位年化', 'P10', '跑赢 QQQ 概率'],
+    H.rule_switch.map((r, i) => ({
+      _cells: [r.label, '<b>' + pct(r.med) + '</b>', pct(r.p10), pct(r.win, 1)],
+      _cls: i === 0 ? '' : ''
+    })));
+}
+
+function renderAmmo() {
+  const A = DATA.ammo;
+  $('#a-cards').innerHTML =
+    card('原文三枪门槛', A.ladder.map(l => l.thr + '%→' + l.frac + '%').join(' / '), 'TQQQ 自身回撤', '') +
+    card('打光那一刻的权重', A.shots.length ? A.shots[A.shots.length - 1].w[0] + '% / ' + A.shots[A.shots.length - 1].w[1] + '% / ' + A.shots[A.shots.length - 1].w[2] + '%' : '-', 'TQQQ / JEPQ / JAAA', 'v-bad') +
+    card('期间 TQQQ 权重最高', pct(A.max_w), '不是 100% —— JEPQ 不是弹药', 'v-warn') +
+    card('本单口径只开一枪', A.single_shot.mult.toFixed(3) + 'x', '原文三档 ' + A.normal.end2015.mult.toFixed(3) + 'x（到 2015）', 'v-good');
+
+  table('#a-shots', ['日期', '第几枪', 'TQQQ 回撤', '打完后的权重 T / J / A', '闸门'],
+    A.shots.map(s => ({
+      _cells: [s.date, '第' + s.shot + '枪', pct(s.dd), s.w[0] + '% / ' + s.w[1] + '% / ' + s.w[2] + '%', s.gated ? '激活' : '未激活'],
+      _cls: s.shot === A.shots.length ? 'bs' : ''
+    })));
+
+  const af = A.after, ends = ['end0202', 'end2012', 'end2015'];
+  const labs = { end0202: '2002-10-09（谷底）', end2012: '2012-12-31', end2015: '2015-02-20（QQQ 回本）' };
+  new Chart($('#aAfter'), {
+    type: 'bar',
+    data: {
+      labels: af.map(a => a.label.replace(/^[A-D] /, '')),
+      datasets: ends.filter(e => af.some(a => a[e])).map((e, i) => ({
+        label: labs[e], data: af.map(a => (a[e] ? a[e].mult : null)),
+        backgroundColor: ['#f8514999', '#d2992299', '#4ea1f999'][i], borderRadius: 4
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } },
+      scales: { y: { ticks: { callback: v => v + 'x' }, grid: { color: '#1e2530' } }, x: { grid: { display: false }, ticks: { maxRotation: 20 } } }
+    }
+  });
+  table('#a-after', ['收尾方式', '2002-10-09 谷底', '2012-12-31', '2015-02-20（QQQ 回本）', '最深回撤', 'TQQQ 权重最高'],
+    af.map(a => ({
+      _cells: [a.label,
+        a.end0202 ? a.end0202.mult.toFixed(3) + 'x' : '—',
+        a.end2012 ? a.end2012.mult.toFixed(3) + 'x' : '—',
+        a.end2015 ? '<b>' + a.end2015.mult.toFixed(3) + 'x</b>' : '—',
+        a.end2015 ? pct(a.end2015.mdd) : '—',
+        a.end2015 ? pct(a.end2015.max_w) : '—'],
+      _cls: a.label.indexOf('C ') === 0 ? '' : (a.label.indexOf('D ') === 0 ? 'bs' : '')
+    })));
+
+  table('#a-full', ['口径', '到 2015 终值', '到 2002 谷底', '最深回撤', 'TQQQ 权重最高'],
+    [
+      { _cells: ['弹药只到 JAAA（原文）', A.normal.end2015.mult.toFixed(3) + 'x', A.normal.end0202.mult.toFixed(3) + 'x', pct(A.normal.end2015.mdd), pct(A.normal.end2015.max_w)] },
+      { _cells: ['连 JEPQ 也当弹药（100% TQQQ）', A.full_tqqq.end2015.mult.toFixed(3) + 'x', A.full_tqqq.end0202.mult.toFixed(3) + 'x', pct(A.full_tqqq.end2015.mdd), pct(A.full_tqqq.end2015.max_w)], _cls: 'bs' }
+    ]);
+  const L = A.levers;
+  $('#a-levers').innerHTML =
+    card('年度再锚定', L.annual + ' 次', '每年 1 月，无条件', 'v-acc') +
+    card('趋势闸门', L.gate + ' 次', '减半 + 恢复，来回打脸', 'v-warn') +
+    card('65% 再平衡', L.rb65 + ' 次', '要求距高点 2% 内', '') +
+    card('补仓', L.btd + ' 次', '原文三档', '');
+  const s = A.single_shot;
+  $('#a-single').innerHTML =
+    card('到 2015 终值', s.mult.toFixed(3) + 'x', '原文三档 ' + A.normal.end2015.mult.toFixed(3) + 'x', 'v-good') +
+    card('最深回撤', pct(s.mdd), '原文三档 ' + pct(A.normal.end2015.mdd), '') +
+    card('开火记录', s.events.map(e => e.date).join(' / ') || '无', 'TQQQ 回撤 ' + (s.events.length ? pct(s.events[0].dd) : '—'), '') +
+    card('TQQQ 权重最高', pct(s.max_w), '上涨途中漂上去的，由再平衡压回', '');
+}
+
