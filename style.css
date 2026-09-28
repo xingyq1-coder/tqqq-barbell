@@ -1,0 +1,69 @@
+:root{
+  --bg:#0d1117; --bg2:#151b23; --card:#171d26; --line:#242c38;
+  --fg:#e6edf3; --fg2:#9aa7b4; --acc:#4ea1ff; --good:#3fb950; --bad:#f85149;
+  --warn:#d29922; --purple:#a371f7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:14px/1.65 -apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif}
+header{position:sticky;top:0;z-index:20;background:rgba(13,17,23,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hwrap{display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 22px 8px;max-width:1500px;margin:0 auto}
+.brand{font-size:17px;font-weight:600}
+.brand span{color:var(--fg2);font-weight:400;font-size:13px}
+.meta{color:var(--fg2);font-size:12px}
+nav{display:flex;gap:4px;flex-wrap:wrap;padding:0 22px 10px;max-width:1500px;margin:0 auto}
+.tab{background:none;border:1px solid transparent;color:var(--fg2);
+  padding:6px 13px;border-radius:7px;cursor:pointer;font-size:13px}
+.tab:hover{color:var(--fg);background:#1b2230}
+.tab.active{background:#1f6feb22;border-color:#1f6feb66;color:#79c0ff}
+main{max-width:1500px;margin:0 auto;padding:20px 22px 60px}
+.panel{display:none}
+.panel.active{display:block}
+h1{font-size:21px;margin:6px 0 4px;font-weight:600}
+h3{font-size:14px;margin:0 0 10px;color:#cdd9e5;font-weight:600}
+.sub{color:var(--fg2);font-size:13px;margin:0 0 16px}
+.lead{font-size:15px;color:#cfd8e3}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.cards.small{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.card .k{color:var(--fg2);font-size:12px;margin-bottom:5px}
+.card .v{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.cards.small .card .v{font-size:18px}
+.card .x{color:var(--fg2);font-size:11.5px;margin-top:3px}
+.v-good{color:var(--good)} .v-bad{color:var(--bad)} .v-warn{color:var(--warn)} .v-acc{color:var(--acc)}
+.box{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:980px){.two{grid-template-columns:1fr}}
+ul,ol{margin:0;padding-left:20px}
+li{margin:5px 0}
+ol.tight li{margin:3px 0}
+.note{color:var(--fg2);font-size:12.5px;margin:10px 0 0}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--fg2);font-weight:500;font-size:12px;text-align:right;position:sticky;top:0;background:var(--bg2)}
+th:first-child,td:first-child{text-align:left}
+tr.bs{background:#f851490f}
+tr:hover td{background:#ffffff06}
+.tblwrap{max-height:620px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.chartbox{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:12px;height:340px;position:relative;margin-bottom:14px}
+.chartbox.tall{height:420px}
+.lab{display:grid;grid-template-columns:330px 1fr;gap:16px}
+@media(max-width:980px){.lab{grid-template-columns:1fr}}
+.ctl{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.ctl label{display:block;margin-bottom:16px;font-size:12.5px;color:var(--fg2)}
+.ctl label b{color:var(--fg);font-weight:600;float:right}
+.ctl select,.ctl input[type=range]{width:100%;margin-top:7px}
+.ctl select{background:#0d1117;color:var(--fg);border:1px solid var(--line);
+  border-radius:7px;padding:7px 9px;font-size:13px}
+input[type=range]{-webkit-appearance:none;height:4px;background:#2b3441;border-radius:3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--acc);cursor:pointer}
+#l-reset{width:100%;background:#1f6feb22;color:#79c0ff;border:1px solid #1f6feb66;
+  border-radius:8px;padding:9px;cursor:pointer;font-size:13px}
+#l-reset:hover{background:#1f6feb33}
+footer{color:#5f6b7a;font-size:12px;text-align:center;padding:22px;border-top:1px solid var(--line)}
+.badge{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;
+  background:#1f6feb22;color:#79c0ff;margin-left:7px}

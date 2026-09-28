@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TQQQ 杠铃策略 · 推演站</title>
+<link rel="stylesheet" href="./style.css">
+<script src="./chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="brand">TQQQ 杠铃策略 <span>· 独立复算与决策推演</span></div>
+    <div class="meta" id="meta"></div>
+  </div>
+  <nav id="tabs">
+    <button class="tab active" data-t="verdict">结论</button>
+    <button class="tab" data-t="lab">参数实验室</button>
+    <button class="tab" data-t="yearly">逐年对照</button>
+    <button class="tab" data-t="windows">窗口扫描</button>
+    <button class="tab" data-t="bswan">黑天鹅场景</button>
+    <button class="tab" data-t="dotcom">科网路径</button>
+    <button class="tab" data-t="plan">执行单 v3</button>
+    <button class="tab" data-t="method">方法与局限</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 结论 -->
+  <section id="verdict" class="panel active">
+    <h1 id="v-head"></h1>
+    <p class="sub" id="v-cfg"></p>
+    <div class="cards" id="v-cards"></div>
+    <div class="two">
+      <div class="box"><h3>三个前提（缺一个，「可行」就不成立）</h3><ol id="v-prem"></ol></div>
+      <div class="box"><h3>三条红线（开仓前写下来）</h3><ol id="v-red"></ol></div>
+    </div>
+    <div class="box"><h3>一句话总结</h3>
+      <p class="lead">这不是一台「1.7 倍 QQQ」的机器。它是一套用 5–10 年的煎熬，换 60–70% 概率跑赢 QQQ 1.2–1.3 倍的结构。
+      它不会死，但会长期难受，而且不保证赢 —— 因为保住它的不是策略，是额度。</p>
+    </div>
+  </section>
+
+  <!-- 参数实验室 -->
+  <section id="lab" class="panel">
+    <h1>参数实验室</h1>
+    <p class="sub">在真实数据（2010-02 → 最新交易日）上实时重算。拖动参数，看规则怎么改变结果。</p>
+    <div class="lab">
+      <div class="ctl">
+        <label>趋势闸门 <b id="l-gate-v">日度 200 日均线</b>
+          <select id="l-gate">
+            <option value="daily" selected>日度 200 日均线</option>
+            <option value="monthly">月度 10 月均线</option>
+            <option value="off">关闭闸门</option>
+          </select></label>
+        <label>补仓门槛 <b id="l-btd-v">-20%</b>
+          <input type="range" id="l-btd" min="-45" max="-10" step="5" value="-20">
+        </label>
+        <label>补仓动用 JAAA 的比例 <b id="l-frac-v">1/3</b>
+          <input type="range" id="l-frac" min="0" max="100" step="1" value="33">
+        </label>
+        <label>再平衡阈值 <b id="l-rb-v">65%</b>
+          <input type="range" id="l-rb" min="55" max="75" step="1" value="65">
+        </label>
+        <button id="l-reset">恢复本单口径</button>
+      </div>
+      <div class="right">
+        <div class="cards small" id="l-cards"></div>
+        <div class="chartbox"><canvas id="labChart"></canvas></div>
+      </div>
+    </div>
+    <p class="note">说明：闸门 = QQQ 跌破均线时把 TQQQ 部位减半转入 JAAA，站回恢复 50/25/25；补仓 = TQQQ 从自身运行高点回撤到门槛时，用 JAAA 的一部分买入 TQQQ（10 个交易日间隔）；再平衡 = TQQQ 权重触及时回归 50/25/25。</p>
+  </section>
+
+  <!-- 逐年 -->
+  <section id="yearly" class="panel">
+    <h1>逐年对照</h1>
+    <p class="sub">策略 = 50/25/25 + 65% 再平衡 + 趋势闸门 + 年度再锚定 + TQQQ -20% 补一半。（1999–2010 的 TQQQ 为合成段，浅色标注）</p>
+    <div class="chartbox tall"><canvas id="yearChart"></canvas></div>
+    <div class="box"><h3>正常年份统计（剔除 2000/2001/2002/2008/2020/2022）</h3>
+      <div class="cards small" id="y-stat"></div></div>
+    <table id="y-table"></table>
+  </section>
+
+  <!-- 窗口 -->
+  <section id="windows" class="panel">
+    <h1>窗口扫描</h1>
+    <p class="sub">同样的规则，换不同的连续年份起点。倍数列 = 策略年化 ÷ QQQ 年化。</p>
+    <div class="box"><h3>分段稳定性（2010–2026 切成四段）</h3>
+      <div class="chartbox"><canvas id="segChart"></canvas></div></div>
+    <table id="w-table"></table>
+  </section>
+
+  <!-- 黑天鹅 -->
+  <section id="bswan" class="panel">
+    <h1>未来黑天鹅压力测试</h1>
+    <p class="sub">8 个场景 × 200 条随机路径 × 10 年。数字为路径中位数。输QQQ / 输现金 = 跑输 QQQ / 跑输 4% 现金 的路径比例。</p>
+    <div class="chartbox tall"><canvas id="scChart"></canvas></div>
+    <table id="sc-table"></table>
+    <div class="box"><h3>最该注意的两条</h3>
+      <ul>
+        <li><b>最危险的不是暴跌，是「高波动 + 低回报」。</b>S8 完全不含崩盘（只是 8% 收益 + 28% 波动），仍有 41% 的路径跑输 QQQ、中位回撤 -70%。不需要崩盘，只需要波动。</li>
+        <li><b>煎熬的时长不由策略决定。</b>各场景「最长水下」策略与 QQQ 几乎一致（S1 9.6 年 vs 9.7 年，S6 7.1 vs 7.0）。策略改变不了你水下待多久，只改变水下多深。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 科网 -->
+  <section id="dotcom" class="panel">
+    <h1>科网路径：2000 年顶部建仓，持有 15 年</h1>
+    <p class="sub" id="d-sub"></p>
+    <div class="chartbox tall"><canvas id="dChart"></canvas></div>
+    <div class="box"><h3>$20,000 的实际过程</h3><table id="d-table"></table></div>
+    <div class="box"><h3>读法（数字由脚本动态生成，不手写）</h3><ul id="d-notes"></ul></div>
+  </section>
+
+  <!-- 执行单 -->
+  <section id="plan" class="panel">
+    <h1>执行单 v3 · $20,000</h1>
+    <div class="two">
+      <div class="box"><h3>一、资金分配</h3>
+        <table id="p-alloc"></table>
+        <p class="note">1 张 TQQQ put = 100 股 ≈ 账户的 34–40%。2 张装不下（$13,600 担保 + $10,000 低波动腿 > $20,000）。硬上限 1 张。</p>
+      </div>
+      <div class="box"><h3>二、三条常驻规则</h3>
+        <ol>
+          <li><b>65% 再平衡</b>：TQQQ 市值达组合 65%（$20,000 时 = $13,000）→ 减回 50/25/25。历史频率约每 16 个月一次。</li>
+          <li><b>趋势闸门</b>：QQQ 收盘跌破 200 日均线（当前 <span id="p-ma"></span>）→ TQQQ 减半入 JAAA；站回 → 恢复 50/25/25。用 QQQ 的均线，不用 TQQQ 的。</li>
+          <li><b>年度再锚定</b>：每年 1 月第一个交易日，恢复到「当前趋势状态应有的配置」（线上 50/25/25，线下 25/25/50）。</li>
+        </ol>
+      </div>
+    </div>
+    <div class="two">
+      <div class="box"><h3>三、Sell Put 建仓</h3>
+        <table id="p-put"></table>
+        <ol class="tight">
+          <li>先买 JEPQ $5,000 与 JAAA $5,000。</li>
+          <li>卖 1 张 TQQQ put（行权价约现价下方 15%、45 天），用真现金担保。</li>
+          <li>未行权 → 权利金落袋，再卖下一张，<b>滚动上限 3 次</b>。</li>
+          <li>被行权 → 持有 100 股，用备用现金补 25 股，停止卖 put。</li>
+          <li>滚满 3 次未接到货 → 停止等待，直接市价买入（上限 $10,000）。</li>
+          <li>put 未了结期间，补仓条款挂起。</li>
+        </ol>
+      </div>
+      <div class="box"><h3>四、补仓（缩水版）</h3>
+        <ul>
+          <li>门槛：TQQQ 从自身运行高点回撤 <b>-20%</b>（今日 = 86.85 × 0.80 = 69.48，创新高后上移）。</li>
+          <li>动用：JAAA 储备的 <b>1/3</b>（$20,000 口径约 $1,667），不是原文的一半。</li>
+          <li>间隔：同一轮下跌至少 10 个交易日，一轮只开一枪。</li>
+          <li>理由：它在 2010-2019 是正贡献，在 2022-2026 是负贡献（年化少 3.6 个点、回撤多 10 个点）。窗口敏感 → 缩水而非删除。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box"><h3>五、规划口径（用最不利的那段，不用最好看的）</h3>
+      <div class="cards small" id="p-plan"></div>
+      <p class="note">悲观 = 2022 起（高利率 + 持续熊 + 高波动）；中性 = 2018 起（四种崩盘形态）；乐观口径（2010–2021 零利率段）只作对照，不能当预期。</p>
+    </div>
+    <div class="box"><h3>六、红线</h3><ol id="p-red"></ol></div>
+  </section>
+
+  <!-- 方法 -->
+  <section id="method" class="panel">
+    <h1>方法与局限</h1>
+    <div class="two">
+      <div class="box"><h3>口径</h3><ul id="m-cal"></ul></div>
+      <div class="box"><h3>局限（必须同时读）</h3><ul id="m-lim"></ul></div>
+    </div>
+    <div class="box"><h3>可复现脚本（/Users/harris/Desktop/tqqq_barbell/）</h3><ul id="m-files"></ul></div>
+  </section>
+</main>
+<footer>本页为记录与研究之用，不构成投资建议。所有数字由本地脚本以公开市场数据复算，可现场复现。</footer>
+<script src="./data.js"></script>
+<script src="./backtest.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
