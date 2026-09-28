@@ -35,7 +35,7 @@ function table(el, head, rows) {
 }
 
 async function boot() {
-  DATA = window.TQQQ_DATA;
+  DATA = window.TQQQ_DATA || await (await fetch('/api/data')).json();
   $('#meta').textContent = `数据截至 ${DATA.meta.last_trade} · QQQ ${DATA.meta.qqq_last.toFixed(2)} · TQQQ ${DATA.meta.tqqq_last.toFixed(2)} · 生成 ${DATA.meta.generated}`;
 
   const V = DATA.verdict, K = V.key;
@@ -254,11 +254,18 @@ function initLab() {
 
 async function runLab() {
   const fv = Number($('#l-frac').value);
-  const q = new URLSearchParams({
+  const p = {
     gate: $('#l-gate').value, btd: $('#l-btd').value / 100,
-    frac: (fv === 33 ? 1/3 : fv / 100), rb: $('#l-rb').value / 100
-  });
-  const res = await (await fetch('/api/backtest?' + q)).json();
+    frac: (fv === 33 ? 1 / 3 : fv / 100),   // 33% 即本单口径的 1/3，避免四舍五入造成口径漂移
+    rb: $('#l-rb').value / 100
+  };
+  let res;
+  if (typeof bt_run === 'function') {
+    res = bt_run(p);                                     // 静态版：浏览器内计算
+  } else {
+    const r = await (await fetch('/api/backtest?' + new URLSearchParams(p))).json();
+    res = { metrics: r.metrics, events: r.events, dates: r.dates, nav: r.nav, qqq: r.qqq, tqqq: r.tqqq, n: r.n };
+  }
   const m = res.metrics, e = res.events;
   $('#l-cards').innerHTML =
     card('年化', pct(m.cagr, 2), 'QQQ ' + pct(m.qqq, 2), 'v-acc') +
